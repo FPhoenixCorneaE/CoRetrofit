@@ -50,6 +50,13 @@ object RetrofitFactory {
     ): T = mRetrofitBuilder.baseUrl(baseUrl).build().create(serviceClass)
 
     /**
+     * 清空 Cookies
+     */
+    fun clearCookies() {
+        mCookieJar.clear()
+    }
+
+    /**
      * 在这里可以添加拦截器，可以对 OkHttpClient.Builder 做任意操作
      */
     private fun OkHttpClient.Builder.setHttpClientBuilder(): OkHttpClient.Builder = apply {
