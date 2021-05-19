@@ -2,6 +2,44 @@
 
 ## **基于 Retrofit2、OkHttp3、Coroutine 的网络请求框架**
 
+### How to include it in your project:
+**Step 1.** Add the JitPack repository to your build file
+
+**groovy**
+```groovy
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	}
+}
+```
+**kotlin**
+```kotlin
+allprojects {
+	repositories {
+		...
+		maven { setUrl("https://jitpack.io") }
+	}
+}
+```
+
+**Step 2.** Add the dependency
+
+**groovy**
+```groovy
+dependencies {
+	implementation("com.github.FPhoenixCorneaE:RxRetrofit:1.0.0")
+}
+```
+**kotlin**
+```kotlin
+dependencies {
+	implementation("com.github.FPhoenixCorneaE:RxRetrofit:1.0.0")
+}
+```
+
+
 ### 一、**异常处理封装**
 
 - **网络连接超时**
