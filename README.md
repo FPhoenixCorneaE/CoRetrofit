@@ -9,7 +9,8 @@
 ```groovy
 allprojects {
 	repositories {
-		...
+        google()
+        mavenCentral()
 		maven { url 'https://jitpack.io' }
 	}
 }
@@ -18,7 +19,8 @@ allprojects {
 ```kotlin
 allprojects {
 	repositories {
-		...
+        google()
+        mavenCentral()
 		maven { setUrl("https://jitpack.io") }
 	}
 }
@@ -26,16 +28,9 @@ allprojects {
 
 **Step 2.** Add the dependency
 
-**groovy**
-```groovy
-dependencies {
-	implementation("com.github.FPhoenixCorneaE:RxRetrofit:1.0.0")
-}
-```
-**kotlin**
 ```kotlin
 dependencies {
-	implementation("com.github.FPhoenixCorneaE:RxRetrofit:1.0.0")
+	implementation("com.github.FPhoenixCorneaE:CoRetrofit:$latest")
 }
 ```
 

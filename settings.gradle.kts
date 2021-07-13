@@ -1,3 +1,4 @@
-include(":rxRetrofit")
 include(":app")
-rootProject.name = "RxRetrofit"
+include(":coRetrofit")
+include(":retrofitUrlManager")
+rootProject.name = "CoRetrofit"

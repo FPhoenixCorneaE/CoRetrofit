@@ -109,7 +109,7 @@ dependencies {
     implementation(Deps.AndroidX.constraintLayout)
     implementation(Deps.AndroidX.material)
     implementation(Deps.AndroidX.recyclerView)
-    implementation(project(mapOf("path" to ":rxRetrofit")))
+    implementation(project(mapOf("path" to ":coRetrofit")))
     testImplementation(Deps.Test.junit)
     androidTestImplementation(Deps.Test.junitExt)
     androidTestImplementation(Deps.Test.espresso)
