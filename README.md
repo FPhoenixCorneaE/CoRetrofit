@@ -5,26 +5,30 @@
 [![](https://jitpack.io/v/FPhoenixCorneaE/CoRetrofit.svg)](https://jitpack.io/#FPhoenixCorneaE/CoRetrofit)
 
 ### How to include it in your project:
+
 **Step 1.** Add the JitPack repository to your build file
 
 **groovy**
+
 ```groovy
 allprojects {
-	repositories {
+    repositories {
         google()
         mavenCentral()
-		maven { url 'https://jitpack.io' }
-	}
+        maven { url 'https://jitpack.io' }
+    }
 }
 ```
+
 **kotlin**
+
 ```kotlin
 allprojects {
-	repositories {
+    repositories {
         google()
         mavenCentral()
-		maven { setUrl("https://jitpack.io") }
-	}
+        maven { setUrl("https://jitpack.io") }
+    }
 }
 ```
 
@@ -32,10 +36,9 @@ allprojects {
 
 ```kotlin
 dependencies {
-	implementation("com.github.FPhoenixCorneaE:CoRetrofit:$latest")
+    implementation("com.github.FPhoenixCorneaE:CoRetrofit:$latest")
 }
 ```
-
 
 ### 一、**异常处理封装**
 
@@ -67,7 +70,9 @@ dependencies {
 - **未知错误**
 
 ### 二、**Retrofit 封装**
+
 - **公共请求头拦截器：HeaderInterceptor**
+
 ```kotlin
 /**
  * @desc：头部参数拦截器，传入 headers
@@ -100,7 +105,9 @@ class HeaderInterceptor(
     }
 }
 ```
+
 - **公共请求参数拦截器：CommonParamsInterceptor**
+
 ```kotlin
 /**
  * @desc：公共请求参数拦截器，传入 commonParams
@@ -127,6 +134,7 @@ class CommonParamsInterceptor(
     }
 }
 ```
+
 - **缓存拦截器：CacheInterceptor**
 
 ```kotlin
@@ -138,16 +146,21 @@ class CommonParamsInterceptor(
 class CacheInterceptor(var day: Int = 7) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
-        if (!NetworkUtil.isConnected) {
-            request = request.newBuilder()
+        request = if (NetworkUtil.isConnected) {
+            request.newBuilder()
+                .cacheControl(CacheControl.FORCE_NETWORK)
+                .build()
+        } else {
+            request.newBuilder()
                 .cacheControl(CacheControl.FORCE_CACHE)
                 .build()
         }
         val response = chain.proceed(request)
-        if (!NetworkUtil.isConnected) {
+        return if (NetworkUtil.isConnected) {
             val maxAge = 60 * 60
             response.newBuilder()
                 .removeHeader("Pragma")
+                .removeHeader("Cache-Control")
                 .header("Cache-Control", "public, max-age=$maxAge")
                 .build()
         } else {
@@ -155,10 +168,10 @@ class CacheInterceptor(var day: Int = 7) : Interceptor {
             val maxStale = 60 * 60 * 24 * day
             response.newBuilder()
                 .removeHeader("Pragma")
+                .removeHeader("Cache-Control")
                 .header("Cache-Control", "public, only-if-cached, max-stale=$maxStale")
                 .build()
         }
-        return response
     }
 }
 ```
@@ -176,6 +189,7 @@ private val mCookieJar: PersistentCookieJar by lazy {
 ```
 
 - **添加公共请求头**
+
 ```
 /**
  * 公共请求头
@@ -184,6 +198,7 @@ var headers: Map<String, String?>? = null
 ```
 
 - **添加公共请求参数**
+
 ```
 /**
  * 公共请求参数
@@ -192,6 +207,7 @@ var commonParams: Map<String, String?>? = null
 ```
 
 - **获取 ServiceApi**
+
 ```kotlin
 /**
  * 获取 ServiceApi
