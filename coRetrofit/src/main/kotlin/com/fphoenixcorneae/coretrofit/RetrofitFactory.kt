@@ -1,10 +1,7 @@
 package com.fphoenixcorneae.coretrofit
 
 import com.fphoenixcorneae.coretrofit.factory.CoroutineCallAdapterFactory
-import com.fphoenixcorneae.coretrofit.interceptor.CacheInterceptor
-import com.fphoenixcorneae.coretrofit.interceptor.CommonParamsInterceptor
-import com.fphoenixcorneae.coretrofit.interceptor.HeaderInterceptor
-import com.fphoenixcorneae.coretrofit.interceptor.HttpLoggingInterceptor
+import com.fphoenixcorneae.coretrofit.interceptor.*
 import com.fphoenixcorneae.util.ContextUtil
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
@@ -64,6 +61,8 @@ object RetrofitFactory {
         addInterceptor(HeaderInterceptor(headers))
         // 添加公共请求参数 commonParams
         addInterceptor(CommonParamsInterceptor(commonParams))
+        // 添加网络拦截器
+        addNetworkInterceptor(NetworkInterceptor())
         // 添加缓存拦截器 可传入缓存天数，不传默认7天
         addInterceptor(CacheInterceptor())
         // 日志拦截器

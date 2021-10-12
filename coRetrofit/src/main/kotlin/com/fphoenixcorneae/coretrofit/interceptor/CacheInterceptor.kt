@@ -11,6 +11,7 @@ import okhttp3.Response
  * @param day 缓存天数 默认7天
  */
 class CacheInterceptor(var day: Int = 7) : Interceptor {
+
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
         request = if (NetworkUtil.isConnected) {
@@ -18,26 +19,13 @@ class CacheInterceptor(var day: Int = 7) : Interceptor {
                 .cacheControl(CacheControl.FORCE_NETWORK)
                 .build()
         } else {
-            request.newBuilder()
-                .cacheControl(CacheControl.FORCE_CACHE)
-                .build()
-        }
-        val response = chain.proceed(request)
-        return if (NetworkUtil.isConnected) {
-            val maxAge = 60 * 60
-            response.newBuilder()
-                .removeHeader("Pragma")
-                .removeHeader("Cache-Control")
-                .header("Cache-Control", "public, max-age=$maxAge")
-                .build()
-        } else {
             // tolerate 4-weeks stale
             val maxStale = 60 * 60 * 24 * day
-            response.newBuilder()
-                .removeHeader("Pragma")
-                .removeHeader("Cache-Control")
+            request.newBuilder()
+                .cacheControl(CacheControl.FORCE_CACHE)
                 .header("Cache-Control", "public, only-if-cached, max-stale=$maxStale")
                 .build()
         }
+        return chain.proceed(request)
     }
 }
