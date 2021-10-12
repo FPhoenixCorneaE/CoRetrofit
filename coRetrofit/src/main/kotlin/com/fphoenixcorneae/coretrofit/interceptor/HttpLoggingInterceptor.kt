@@ -1,6 +1,6 @@
 package com.fphoenixcorneae.coretrofit.interceptor
 
-import com.fphoenixcorneae.ext.loggerD
+import com.fphoenixcorneae.ext.logd
 import com.fphoenixcorneae.util.AppUtil
 import okhttp3.Headers
 import okhttp3.Interceptor
@@ -12,6 +12,7 @@ import java.io.EOFException
 import java.net.URLDecoder
 import java.nio.charset.Charset
 import java.nio.charset.UnsupportedCharsetException
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -22,29 +23,21 @@ class HttpLoggingInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-
         if (!AppUtil.isDebuggable) {
             return chain.proceed(request)
         }
-
         val logInfo = StringBuilder("")
-
         val requestBody = request.body()
-
         val connection = chain.connection()
         val protocol = connection?.protocol() ?: Protocol.HTTP_1_1
-        logInfo.append("${request.method().toUpperCase()}: ${request.url()} $protocol\n")
-
+        logInfo.append("${request.method().uppercase(Locale.getDefault())}: ${request.url()} $protocol\n")
         val hasRequestBody = null != requestBody
         if (hasRequestBody) {
             logInfo.append("Content-Type: ${requestBody?.contentType()}\n")
             logInfo.append("Content-Length: ${requestBody?.contentLength()}\n")
         }
-
         var headers = request.headers()
-
         logInfo.append("\nRequest headers =>\n")
-
         var count  = headers.size()
         var i = 0
         while (i < count) {
@@ -54,10 +47,8 @@ class HttpLoggingInterceptor : Interceptor {
             }
             i++
         }
-
         logInfo.append("\nRequest params =>\n")
         val utf8 = Charset.forName("UTF-8")
-
         if (hasRequestBody) {
             var charset: Charset? = null
             val buffer = Buffer()
@@ -88,17 +79,12 @@ class HttpLoggingInterceptor : Interceptor {
             throw e
         }
         val tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs)
-
         logInfo.append("Total time: ${tookMs}ms\n")
-
         val responseBody = response.body()
         val contentLength = responseBody!!.contentLength()
         val bodySize = if (contentLength != -1L) "$contentLength-byte" else "unknown-length"
-
         logInfo.append("Status code: ${response.code()} message: ${response.message()} body size: ${bodySize}\n")
-
         logInfo.append("\nResponse headers =>\n")
-
         headers = response.headers()
         i = 0
         count = headers.size()
@@ -106,8 +92,6 @@ class HttpLoggingInterceptor : Interceptor {
             logInfo.append("${headers.name(i)} : ${headers.value(i)}\n")
             i++
         }
-
-
         logInfo.append("\nResponse body =>\n")
         if (HttpHeaders.hasBody(response) && !bodyEncoded(response.headers())) {
             val source = responseBody.source()
@@ -123,19 +107,15 @@ class HttpLoggingInterceptor : Interceptor {
                     return response
                 }
             }
-
             if (!isPlaintext(buffer)) {
                 logInfo.append("binary " + buffer.size() + "-byte body omitted\n")
                 return response
             }
-
             if (contentLength != 0L) {
                 logInfo.append("${buffer.clone().readString(charset ?: utf8)}\n")
             }
         }
-
-        loggerD(logInfo.toString())
-
+        logInfo.toString().logd("OkHttp")
         return response
     }
 
