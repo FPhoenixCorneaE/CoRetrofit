@@ -2,6 +2,8 @@
 
 ## **基于 Retrofit2、OkHttp3、Coroutine 的网络请求框架**
 
+[![](https://jitpack.io/v/FPhoenixCorneaE/CoRetrofit.svg)](https://jitpack.io/#FPhoenixCorneaE/CoRetrofit)
+
 ### How to include it in your project:
 **Step 1.** Add the JitPack repository to your build file
 
