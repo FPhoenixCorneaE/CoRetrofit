@@ -14,15 +14,15 @@ class ApiException : Exception {
     /**
      * 错误码
      */
-    var errCode: Int = 0
+    var errorCode: Int = 0
 
     constructor(errCode: Int, error: String?) : super(error) {
-        this.errCode = errCode
+        this.errorCode = errCode
         this.errorMsg = error ?: "请求失败，请稍后重试！"
     }
 
     constructor(error: Error, e: Throwable?) {
-        errCode = error.getCode()
+        errorCode = error.getCode()
         errorMsg = error.getErrorMsg()
     }
 }

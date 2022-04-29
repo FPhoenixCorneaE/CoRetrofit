@@ -5,20 +5,20 @@ plugins {
 }
 
 android {
-    compileSdkVersion(Deps.Versions.compileSdkVersion)
-    buildToolsVersion(Deps.Versions.buildToolsVersion)
+    compileSdk=Deps.Versions.compileSdkVersion
+    buildToolsVersion=Deps.Versions.buildToolsVersion
 
     defaultConfig {
         applicationId = Deps.applicationId
-        minSdkVersion(Deps.Versions.minSdkVersion)
-        targetSdkVersion(Deps.Versions.targetSdkVersion)
+        minSdk=Deps.Versions.minSdkVersion
+        targetSdk=Deps.Versions.targetSdkVersion
         versionCode = Deps.Versions.versionCode
         versionName = Deps.Versions.versionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
         ndk {
             // 设置支持的SO库架构
-            abiFilters.add("armeabi-v7a")  //'armeabi', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+            abiFilters.addAll(listOf("armeabi-v7a", "x86"))  //'armeabi', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
         }
     }
 
@@ -40,19 +40,15 @@ android {
     }
 
     compileOptions {
-        targetCompatibility = JavaVersion.VERSION_1_8
-        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
-    dexOptions {
-        jumboMode = true
-    }
-
-    lintOptions {
+    lint {
         isCheckReleaseBuilds = false
         isAbortOnError = false
     }
@@ -63,7 +59,7 @@ android {
     }
 
     packagingOptions {
-        exclude("META-INF/proguard/coroutines.pro")
+        resources.excludes.add("META-INF/proguard/coroutines.pro")
     }
 }
 
@@ -103,13 +99,13 @@ fun listSubFile(): ArrayList<String> {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(Deps.Kotlin.stdLib)
     implementation(Deps.AndroidX.coreKtx)
     implementation(Deps.AndroidX.appcompat)
     implementation(Deps.AndroidX.constraintLayout)
     implementation(Deps.AndroidX.material)
     implementation(Deps.AndroidX.recyclerView)
     implementation(project(mapOf("path" to ":coRetrofit")))
+    implementation(Deps.FPhoenixCorneaE.common)
     testImplementation(Deps.Test.junit)
     androidTestImplementation(Deps.Test.junitExt)
     androidTestImplementation(Deps.Test.espresso)

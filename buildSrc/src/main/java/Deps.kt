@@ -11,31 +11,27 @@ object Deps {
     const val applicationId = "com.fphoenixcorneae.coretrofit.demo"
 
     object FPhoenixCorneaE {
-        const val commonUtil = "com.github.FPhoenixCorneaE:CommonUtil:1.1.1"
-    }
-
-    object GradlePlugin {
-        const val gradle = "com.android.tools.build:gradle:4.2.2"
-        const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlinVersion}"
-        const val androidMaven = "com.github.dcendents:android-maven-gradle-plugin:2.1"
+        const val common = "com.github.FPhoenixCorneaE:Common:2.0.4"
     }
 
     object PluginIds {
         const val application = "com.android.application"
         const val library = "com.android.library"
+        const val kotlin = "org.jetbrains.kotlin.android"
         const val kotlinAndroid = "android"
         const val kotlinParcelize = "kotlin-parcelize"
         const val kotlinKapt = "kapt"
     }
 
     object Versions {
-        const val compileSdkVersion = 30
-        const val buildToolsVersion = "30.0.3"
+        const val compileSdkVersion = 32
+        const val buildToolsVersion = "32.0.0"
         const val minSdkVersion = 21
-        const val targetSdkVersion = 30
-        const val versionCode = 103
-        const val versionName = "1.0.3"
-        const val kotlinVersion = "1.5.20"
+        const val targetSdkVersion = 32
+        const val versionCode = 104
+        const val versionName = "1.0.4"
+        const val agpVersion = "7.0.3"
+        const val kotlinVersion = "1.6.10"
     }
 
     object BuildType {
@@ -43,36 +39,26 @@ object Deps {
         const val Release = "release"
     }
 
-    object Kotlin {
-        const val stdLib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlinVersion}"
-    }
-
     /**
-     * 协程
+     * 协程：https://github.com/Kotlin/kotlinx.coroutines
      */
     object Coroutines {
-        const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3"
-        const val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3"
+        const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0"
+        const val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
     }
 
     object AndroidX {
-        const val appcompat = "androidx.appcompat:appcompat:1.2.0"
-        const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.0.4"
-        const val recyclerView = "androidx.recyclerview:recyclerview:1.1.0"
-        const val viewpager2 = "androidx.viewpager2:viewpager2:1.0.0"
-        const val material = "com.google.android.material:material:1.2.1"
-        const val flexBox = "com.google.android:flexbox:2.0.1"
-        const val coreKtx = "androidx.core:core-ktx:1.3.1"
-        const val activityKtx = "androidx.activity:activity-ktx:1.1.0"
-        const val fragmentKtx = "androidx.fragment:fragment-ktx:1.3.0-beta01"
-        const val cardView = "androidx.cardview:cardview:1.0.0"
-        const val swipeRefreshLayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+        const val appcompat = "androidx.appcompat:appcompat:1.4.1"
+        const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.3"
+        const val recyclerView = "androidx.recyclerview:recyclerview:1.2.1"
+        const val material = "com.google.android.material:material:1.4.0"
+        const val coreKtx = "androidx.core:core-ktx:1.7.0"
     }
 
     object Test {
-        const val junit = "junit:junit:4.12"
-        const val junitExt = "androidx.test.ext:junit:1.1.2"
-        const val espresso = "androidx.test.espresso:espresso-core:3.3.0"
+        const val junit = "junit:junit:4.13.2"
+        const val junitExt = "androidx.test.ext:junit:1.1.3"
+        const val espresso = "androidx.test.espresso:espresso-core:3.4.0"
     }
 
     object Retrofit2 {

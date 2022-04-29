@@ -1,7 +1,7 @@
 package com.fphoenixcorneae.coretrofit.interceptor
 
-import com.fphoenixcorneae.ext.logd
-import com.fphoenixcorneae.util.AppUtil
+import com.fphoenixcorneae.common.ext.isDebuggable
+import com.fphoenixcorneae.common.ext.logd
 import okhttp3.Headers
 import okhttp3.Interceptor
 import okhttp3.Protocol
@@ -23,7 +23,7 @@ class HttpLoggingInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
-        if (!AppUtil.isDebuggable) {
+        if (!isDebuggable) {
             return chain.proceed(request)
         }
         val logInfo = StringBuilder("")
@@ -96,7 +96,7 @@ class HttpLoggingInterceptor : Interceptor {
         if (HttpHeaders.hasBody(response) && !bodyEncoded(response.headers())) {
             val source = responseBody.source()
             source.request(Long.MAX_VALUE) // Buffer the entire body.
-            val buffer = source.buffer()
+            val buffer = source.buffer
             var charset: Charset? = utf8
             val contentType = responseBody.contentType()
             if (contentType != null) {
@@ -141,6 +141,6 @@ class HttpLoggingInterceptor : Interceptor {
 
     private fun bodyEncoded(headers: Headers): Boolean {
         val contentEncoding = headers["Content-Encoding"]
-        return contentEncoding != null && !contentEncoding.equals("identity", ignoreCase = true)
+        return contentEncoding != null && !contentEncoding.equals(other = "identity", ignoreCase = true)
     }
 }

@@ -1,6 +1,6 @@
 package com.fphoenixcorneae.coretrofit.interceptor
 
-import com.fphoenixcorneae.util.NetworkUtil
+import com.fphoenixcorneae.common.ext.isNetworkConnected
 import okhttp3.CacheControl
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -14,7 +14,7 @@ class CacheInterceptor(var day: Int = 7) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
-        request = if (NetworkUtil.isConnected) {
+        request = if (isNetworkConnected) {
             request.newBuilder()
                 .cacheControl(CacheControl.FORCE_NETWORK)
                 .build()

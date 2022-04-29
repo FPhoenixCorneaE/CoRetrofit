@@ -1,6 +1,6 @@
 package com.fphoenixcorneae.coretrofit.exception
 
-import com.fphoenixcorneae.ext.loggerE
+import com.fphoenixcorneae.common.ext.loge
 import com.google.gson.JsonParseException
 import com.google.gson.stream.MalformedJsonException
 import org.apache.http.conn.ConnectTimeoutException
@@ -15,7 +15,7 @@ import javax.net.ssl.SSLHandshakeException
  * @desc：异常处理类
  * @date：2021/4/4 14:13
  */
-object ExceptionHandle {
+object ExceptionHandler {
 
     fun handleException(t: Throwable?): ApiException {
         val e = when (t) {
@@ -48,7 +48,7 @@ object ExceptionHandle {
             else -> ApiException(Error.UNKNOWN, t)
         }
 
-        loggerE("errorCode:${e.errCode} errorMsg:${e.errorMsg}")
+        "errorCode:${e.errorCode} errorMsg:${e.errorMsg}".loge()
         return e
     }
 }

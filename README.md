@@ -1,6 +1,6 @@
 # **CoRetrofit**
 
-## **基于 Retrofit2、OkHttp3、Coroutine 的网络请求框架**
+## **基于 Coroutines + Retrofit2 + OkHttp3 的网络请求框架**
 
 [![](https://jitpack.io/v/FPhoenixCorneaE/CoRetrofit.svg)](https://jitpack.io/#FPhoenixCorneaE/CoRetrofit)
 
@@ -27,7 +27,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { setUrl("https://jitpack.io") }
+        maven("https://jitpack.io")
     }
 }
 ```
@@ -40,36 +40,9 @@ dependencies {
 }
 ```
 
-### 一、**异常处理封装**
+<br>
 
-- **网络连接超时**
-    - **SocketTimeoutException**
-    - **ConnectTimeoutException**
-- **网络错误**
-    - **SocketException**
-    - **ConnectException**
-- **Http 错误**
-    - **HttpException**
-
-- **数据解析错误**
-    - **JsonParseException**
-    - **JSONException**
-    - **ParseException**
-    - **MalformedJsonException**
-    - **NumberFormatException**
-- **服务器内部错误**
-    - **ApiException**
-- **参数错误**
-    - **IllegalArgumentException**
-- **证书错误**
-    - **SSLException**
-    - **SSLHandshakeException**
-- **未知主机**
-    - **UnknownHostException**
-    - **UnknownServiceException**
-- **未知错误**
-
-### 二、**Retrofit 封装**
+### 一、RetrofitFactory
 
 - **公共请求头拦截器：HeaderInterceptor**
 
@@ -184,36 +157,195 @@ class CacheInterceptor(var day: Int = 7) : Interceptor {
  * Cookies 自动持久化
  */
 private val mCookieJar: PersistentCookieJar by lazy {
-    PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(ContextUtil.context))
+    PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(applicationContext))
 }
 ```
 
 - **添加公共请求头**
 
-```
+```kotlin
 /**
  * 公共请求头
  */
 var headers: Map<String, String?>? = null
 ```
 
+> 示例：
+>
+> ```kotlin
+> // 设置公共请求头
+> RetrofitFactory.headers = hashMapOf("platform" to "Android", "androidID" to androidID)
+> ```
+
 - **添加公共请求参数**
 
-```
+```kotlin
 /**
  * 公共请求参数
  */
 var commonParams: Map<String, String?>? = null
 ```
 
-- **获取 ServiceApi**
+> 示例：
+>
+> ```kotlin
+> // 设置公共请求参数
+> RetrofitFactory.commonParams = hashMapOf("token" to androidID.md5())
+> ```
+
+- **获取Service**
 
 ```kotlin
 /**
- * 获取 ServiceApi
+ * 获取Service
  */
-fun <T> getApi(
-    serviceClass: Class<T>,
-    baseUrl: String
-): T = mRetrofitBuilder.baseUrl(baseUrl).build().create(serviceClass)
+inline fun <reified T> createService(): T = mRetrofit.create(T::class.java)
 ```
+
+> 示例：
+>
+> ```kotlin
+> /** 双重校验锁式-单例, 封装 Service, 方便直接快速调用接口 */
+> val commonService by lazy {
+>     RetrofitFactory.createService<CommonService>()
+> }
+> ```
+
+* **清空Cookies**
+
+```kotlin
+/**
+ * 清空Cookies
+ */
+fun clearCookies() {
+    mCookieJar.clear()
+}
+```
+
+<br>
+
+### 二、解决Retrofit多BaseUrl及运行时动态改变BaseUrl：[RetrofitUrlManager](https://github.com/JessYanCoding/RetrofitUrlManager)
+
+* ##### 1) 初始化所有的BaseUrl
+
+```kotlin
+RetrofitUrlManager.getInstance().setDebug(isDebuggable)
+// 将每个 BaseUrl 进行初始化,运行时可以随时改变 DOMAIN_NAME 对应的值,从而达到切换 BaseUrl 的效果
+RetrofitUrlManager.getInstance().putDomain(UrlConstant.DOMAIN_WAN_ANDROID, UrlConstant.BASE_URL_WAN_ANDROID)
+RetrofitUrlManager.getInstance().putDomain(UrlConstant.DOMAIN_EYEPETIZER, UrlConstant.BASE_URL_EYEPETIZER)
+```
+
+* ##### 2) 设置全局的BaseUrl
+
+```kotlin
+// 设置全局的 BaseUrl
+RetrofitUrlManager.getInstance().setGlobalDomain(UrlConstant.BASE_URL_WAN_ANDROID)
+```
+
+* ##### 3) 需要动态改变BaseUrl时，在网络接口上添加注解 @Headers
+
+```kotlin
+/**
+ * 玩安卓-首页Banner
+ */
+@Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER.plus(UrlConstant.DOMAIN_WAN_ANDROID))
+@GET("banner/json")
+suspend fun getBannerList(): WanAndroidBaseBean<ArrayList<WanAndroidBannerBean>>
+
+/**
+ * 开眼-获取分类
+ */
+@Headers(RetrofitUrlManager.DOMAIN_NAME_HEADER.plus(UrlConstant.DOMAIN_EYEPETIZER))
+@GET("v4/categories")
+suspend fun getCategory(): ArrayList<OpenEyesCategoryBean>
+```
+
+* 更多模式玩法与替换规则
+    - [解决Retrofit多BaseUrl及运行时动态改变BaseUrl(一)](https://www.jianshu.com/p/2919bdb8d09a)
+    - [解决Retrofit多BaseUrl及运行时动态改变BaseUrl(二)](https://www.jianshu.com/p/35a8959c2f86)
+
+<br>
+
+### 三、可自定义服务器返回数据的基类
+
+如果你请求服务器返回的数据有基类（没有可忽略），例如：
+
+```json
+{
+  "data": ...,
+  "errorCode": 0,
+  "errorMsg": ""
+}
+```
+
+基类继承**BaseResponse<T>**，请求时框架可以帮你自动脱壳，自动判断是否请求成功。
+
+```kotlin
+/**
+ * @desc： 服务器返回数据的基类
+ * 如果你的项目中有基类，那美滋滋，可以继承BaseResponse，请求时框架可以帮你自动脱壳，自动判断是否请求成功，怎么做：
+ * 1.继承 BaseResponse
+ * 2.重写 isSuccess 方法，编写你的业务需求，根据自己的条件判断数据是否请求成功
+ * 3.重写 getResponseCode、getResponseData、getResponseMsg方法，传入你的 code data msg
+ * @date：2021/11/17 11:39
+ */
+@Keep
+data class WanAndroidBaseBean<T>(
+    val errorCode: Int,
+    val errorMsg: String?,
+    val data: T?
+) : BaseResponse<T>(), Serializable {
+    /**
+     * WanAndroid网站返回的 错误码为 0 就代表请求成功
+     */
+    override fun isSuccess(): Boolean = errorCode == 0
+
+    override fun getResponseData(): T? = data
+
+    override fun getResponseCode(): Int = errorCode
+
+    override fun getResponseMsg(): String? = errorMsg
+}
+```
+
+<br>
+
+### 四、异常处理
+
+- **网络连接超时**
+    - **SocketTimeoutException**
+    - **ConnectTimeoutException**
+- **网络错误**
+    - **SocketException**
+    - **ConnectException**
+- **Http 错误**
+    - **HttpException**
+
+- **数据解析错误**
+    - **JsonParseException**
+    - **JSONException**
+    - **ParseException**
+    - **MalformedJsonException**
+    - **NumberFormatException**
+- **服务器内部错误**
+    - **ApiException**
+- **参数错误**
+    - **IllegalArgumentException**
+- **证书错误**
+    - **SSLException**
+    - **SSLHandshakeException**
+- **未知主机**
+    - **UnknownHostException**
+    - **UnknownServiceException**
+- **未知错误**
+
+> 示例：
+>
+> ```kotlin
+> /**
+>  * 异常转换异常处理
+>  */
+> fun <T> MutableStateFlow<Result<T>>.paresException(e: Throwable) {
+>     this.value = Result.onError(ExceptionHandler.handleException(e))
+> }
+> ```

@@ -6,24 +6,20 @@ plugins {
 }
 
 android {
-    compileSdkVersion(Deps.Versions.compileSdkVersion)
-    buildToolsVersion(Deps.Versions.buildToolsVersion)
+    compileSdk = Deps.Versions.compileSdkVersion
+    buildToolsVersion = Deps.Versions.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion(Deps.Versions.minSdkVersion)
-        targetSdkVersion(Deps.Versions.targetSdkVersion)
-        versionCode = Deps.Versions.versionCode
-        versionName = Deps.Versions.versionName
+        minSdk = Deps.Versions.minSdkVersion
+        targetSdk = Deps.Versions.targetSdkVersion
 
-        setConsumerProguardFiles(listOf("consumer-rules.pro"))
+        consumerProguardFile("consumer-rules.pro")
     }
 
     buildTypes {
         getByName(Deps.BuildType.Release) {
             // 执行proguard混淆
             isMinifyEnabled = false
-            // Zipalign优化
-            isZipAlignEnabled = true
             // 移除无用的resource文件
             isShrinkResources = false
             proguardFiles(
@@ -34,8 +30,6 @@ android {
         getByName(Deps.BuildType.Debug) {
             // 执行proguard混淆
             isMinifyEnabled = false
-            // Zipalign优化
-            isZipAlignEnabled = true
             // 移除无用的resource文件
             isShrinkResources = false
             proguardFiles(
@@ -51,19 +45,15 @@ android {
     }
 
     compileOptions {
-        targetCompatibility = JavaVersion.VERSION_1_8
-        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
-    dexOptions {
-        jumboMode = true
-    }
-
-    lintOptions {
+    lint {
         isCheckReleaseBuilds = false
         isAbortOnError = false
     }
@@ -71,12 +61,11 @@ android {
 
 dependencies {
     compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    compileOnly(Deps.Kotlin.stdLib)
     compileOnly(Deps.AndroidX.coreKtx)
     compileOnly(Deps.AndroidX.appcompat)
     compileOnly(Deps.Coroutines.core)
     compileOnly(Deps.Coroutines.android)
-    compileOnly(Deps.FPhoenixCorneaE.commonUtil)
+    compileOnly(Deps.FPhoenixCorneaE.common)
     api(project(mapOf("path" to ":retrofitUrlManager")))
     api(Deps.Retrofit2.retrofit)
     api(Deps.Retrofit2.converterGson)

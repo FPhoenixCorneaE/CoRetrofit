@@ -1,8 +1,8 @@
 package com.fphoenixcorneae.coretrofit
 
-import com.fphoenixcorneae.coretrofit.factory.CoroutineCallAdapterFactory
+import com.fphoenixcorneae.common.ext.applicationContext
+import com.fphoenixcorneae.coretrofit.factory.CoroutinesCallAdapterFactory
 import com.fphoenixcorneae.coretrofit.interceptor.*
-import com.fphoenixcorneae.util.ContextUtil
 import com.franmontiel.persistentcookiejar.PersistentCookieJar
 import com.franmontiel.persistentcookiejar.cache.SetCookieCache
 import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor
@@ -39,15 +39,12 @@ object RetrofitFactory {
     var commonParams: Map<String, String?>? = null
 
     /**
-     * 获取 ServiceApi
+     * 获取Service
      */
-    fun <T> getApi(
-        serviceClass: Class<T>,
-        baseUrl: String
-    ): T = mRetrofitBuilder.baseUrl(baseUrl).build().create(serviceClass)
+    inline fun <reified T> createService(): T = mRetrofit.create(T::class.java)
 
     /**
-     * 清空 Cookies
+     * 清空Cookies
      */
     fun clearCookies() {
         mCookieJar.clear()
@@ -72,7 +69,7 @@ object RetrofitFactory {
         // 错误重连
         retryOnConnectionFailure(true)
         // 设置缓存配置 缓存最大 10M
-        cache(Cache(File(ContextUtil.context.cacheDir, NET_CACHE_DIR), NET_CACHE_MAX_SIZE))
+        cache(Cache(File(applicationContext.cacheDir, NET_CACHE_DIR), NET_CACHE_MAX_SIZE))
         // 添加 Cookies 自动持久化
         cookieJar(mCookieJar)
         // 超时时间 连接、读、写
@@ -86,23 +83,21 @@ object RetrofitFactory {
      */
     private fun Retrofit.Builder.setRetrofitBuilder(): Retrofit.Builder = apply {
         addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-        addCallAdapterFactory(CoroutineCallAdapterFactory())
+        addCallAdapterFactory(CoroutinesCallAdapterFactory())
     }
 
     /**
      * Cookies 自动持久化
      */
     private val mCookieJar: PersistentCookieJar by lazy {
-        PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(ContextUtil.context))
+        PersistentCookieJar(SetCookieCache(), SharedPrefsCookiePersistor(applicationContext))
     }
 
     /**
      * OkHttpClient
      */
     private val mOkHttpClient: OkHttpClient by lazy {
-        RetrofitUrlManager
-            .getInstance()
-            .with(OkHttpClient.Builder())
+        RetrofitUrlManager.getInstance().with(OkHttpClient.Builder())
             .setHttpClientBuilder()
             .build()
     }
@@ -110,10 +105,12 @@ object RetrofitFactory {
     /**
      * RetrofitBuilder
      */
-    private val mRetrofitBuilder: Retrofit.Builder by lazy {
+    val mRetrofit: Retrofit by lazy {
         Retrofit.Builder()
+            .baseUrl("https://www.baidu.com")
             .client(mOkHttpClient)
             .setRetrofitBuilder()
+            .build()
     }
 }
 
