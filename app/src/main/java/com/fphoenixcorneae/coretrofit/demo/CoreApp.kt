@@ -21,7 +21,7 @@ class CoreApp : Application() {
         RetrofitUrlManager.getInstance().putDomain(UrlConstant.DOMAIN_WAN_ANDROID, UrlConstant.BASE_URL_WAN_ANDROID)
         RetrofitUrlManager.getInstance().putDomain(UrlConstant.DOMAIN_EYEPETIZER, UrlConstant.BASE_URL_EYEPETIZER)
         // 设置全局的 BaseUrl
-        RetrofitUrlManager.getInstance().setGlobalDomain(UrlConstant.DOMAIN_WAN_ANDROID)
+        RetrofitUrlManager.getInstance().setGlobalDomain(UrlConstant.BASE_URL_WAN_ANDROID)
 
         // 设置公共请求头
         RetrofitFactory.headers = hashMapOf("platform" to "Android", "androidID" to androidID)

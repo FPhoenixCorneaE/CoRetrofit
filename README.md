@@ -239,7 +239,7 @@ RetrofitUrlManager.getInstance().putDomain(UrlConstant.DOMAIN_EYEPETIZER, UrlCon
 
 ```kotlin
 // 设置全局的 BaseUrl
-RetrofitUrlManager.getInstance().setGlobalDomain(UrlConstant.DOMAIN_WAN_ANDROID)
+RetrofitUrlManager.getInstance().setGlobalDomain(UrlConstant.BASE_URL_WAN_ANDROID)
 ```
 
 * ##### 3) 需要动态改变BaseUrl时，在网络接口上添加注解 @Headers
